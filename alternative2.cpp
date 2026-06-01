@@ -1,30 +1,28 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <iomanip>
 using namespace std;
 
-// 1. Struktur Data untuk Transaksi
 struct Transaksi {
     int id;
     string tanggal;
-    string kategori;  // "Pemasukan" atau "Pengeluaran"
+    string kategori;
     string deskripsi;
     double jumlah;
 };
 
-// Global variables - Menggunakan Raw Pointer untuk manajemen memori dinamis
 const int MAX_TRANSAKSI = 1000;
-Transaksi* daftarTransaksi = nullptr; // Pointer ke array transaksi dinamis
+Transaksi* daftarTransaksi = nullptr;
 int jumlahData = 0;
 const string FILENAME = "data_keuangan.txt";
 
-// Prototipe Fungsi
 void tambahTransaksi();
 void lihatRiwayat();
 void urutkanData();
 void cariTransaksi();
 void laporanKeuangan();
+void editTransaksi();
+void hapusTransaksi();
 void simpanKeFile();
 void bacaDariFile();
 double hitungTotalRekursif(int n);
@@ -32,23 +30,14 @@ void tampilkanHeader();
 void alokasikanMemori();
 void bebaskanMemori();
 
-// --- FUNGSI UTAMA ---
 int main() {
-    // 1. Alokasikan memori dinamis
     alokasikanMemori();
-    
-    // 2. Baca data keuangan dari file
     bacaDariFile();
     
     int pilihan;
 
     do {
-        // Membersihkan layar konsol secara portabel
-        #ifdef _WIN32
-            system("cls");
-        #else
-            system("clear");
-        #endif
+        system("cls");
 
         cout << "======================================================" << endl;
         cout << "   PERSONAL FINANCE MANAGER (C++ Pointer & Array) " << endl;
@@ -58,18 +47,19 @@ int main() {
         cout << "3. Urutkan Data (Nominal Terbesar)" << endl;
         cout << "4. Cari Transaksi (Deskripsi)" << endl;
         cout << "5. Laporan Keuangan (Rekursif)" << endl;
-        cout << "6. Simpan & Keluar" << endl;
+        cout << "6. Edit Transaksi" << endl;
+        cout << "7. Hapus Transaksi" << endl;
+        cout << "8. Simpan & Keluar" << endl;
         cout << "------------------------------------------------------" << endl;
-        cout << "Pilih Menu (1-6): ";
+        cout << "Pilih Menu (1-8): ";
         
-        // Error handling apabila pengguna memasukkan input non-numerik
         if (!(cin >> pilihan)) {
-            cout << "Error: Input tidak valid! Harap masukkan angka 1-6." << endl;
-            cin.clear();             // Membersihkan error flag dari cin stream
-            cin.ignore(10000, '\n'); // Membersihkan karakter sisa di buffer
-            pilihan = 0;             // Reset pilihan agar berulang kembali
+            cout << "Error: Input tidak valid! Harap masukkan angka 1-8." << endl;
+            cin.clear();             
+            cin.ignore(10000, '\n'); 
+            pilihan = 0;             
         } else {
-            cin.ignore(10000, '\n'); // Bersihkan sisa karakter buffer (termasuk newline)
+            cin.ignore(10000, '\n'); 
         }
 
         switch (pilihan) {
@@ -78,29 +68,29 @@ int main() {
             case 3: urutkanData(); break;
             case 4: cariTransaksi(); break;
             case 5: laporanKeuangan(); break;
-            case 6: 
+            case 6: editTransaksi(); break;
+            case 7: hapusTransaksi(); break;
+            case 8: 
                 simpanKeFile(); 
                 cout << "Seluruh data berhasil ditulis ke " << FILENAME << endl;
                 cout << "Program selesai. Terima kasih!" << endl; 
                 break;
             default: 
                 if (pilihan != 0) {
-                    cout << "Pilihan salah! Silakan masukkan opsi 1 hingga 6." << endl;
+                    cout << "Pilihan salah! Silakan masukkan opsi 1 hingga 8." << endl;
                 }
         }
 
-        if (pilihan != 6) {
+        if (pilihan != 8) {
             cout << "\nTekan Enter untuk kembali ke menu utama...";
             cin.get();
         }
-    } while (pilihan != 6);
+    } while (pilihan != 8);
 
-    // Bebaskan memori sebelum program exit
     bebaskanMemori();
     return 0;
 }
 
-// Implementasi Alokasi Memori
 void alokasikanMemori() {
     daftarTransaksi = new Transaksi[MAX_TRANSAKSI];
     if (daftarTransaksi == nullptr) {
@@ -109,7 +99,6 @@ void alokasikanMemori() {
     }
 }
 
-// Implementasi Bebaskan Memori
 void bebaskanMemori() {
     if (daftarTransaksi != nullptr) {
         delete[] daftarTransaksi;
@@ -117,9 +106,6 @@ void bebaskanMemori() {
     }
 }
 
-
-
-// Fungsi Tambah Transaksi
 void tambahTransaksi() {
     if (daftarTransaksi == nullptr) {
         cerr << "Error: Heap memori belum diinisialisasi!" << endl;
@@ -160,7 +146,6 @@ void tambahTransaksi() {
         t->deskripsi = "null";
     }
     
-    // Validasi input nominal harus di atas nol
     while (true) {
         cout << "Nominal (Jumlah > 0): "; 
         if (cin >> t->jumlah && t->jumlah >= 0) {
@@ -177,17 +162,11 @@ void tambahTransaksi() {
     cout << "Data transaksi baru berhasil dimasukkan ke memori!" << endl;
 }
 
-// Cetak header tabel
 void tampilkanHeader() {
-    cout << left << setw(6) << "ID"
-         << setw(14) << "Tanggal"
-         << setw(16) << "Kategori"
-         << setw(25) << "Deskripsi"
-         << "Nominal (Rp)" << endl;
-    cout << string(73, '-') << endl;
+    cout << "ID     Tanggal         Kategori        Deskripsi             Nominal (Rp)" << endl;
+    cout << string(80, '-') << endl;
 }
 
-// Lihat Riwayat Transaksi
 void lihatRiwayat() {
     cout << "\n--- RIWAYAT TRANSAKSI ---" << endl;
     if (daftarTransaksi == nullptr) {
@@ -202,15 +181,20 @@ void lihatRiwayat() {
     tampilkanHeader();
     for (int i = 0; i < jumlahData; i++) {
         Transaksi* t = &daftarTransaksi[i];
-        cout << left << setw(6) << t->id
-             << setw(14) << t->tanggal
-             << setw(16) << t->kategori
-             << setw(25) << t->deskripsi
-             << "Rp " << fixed << setprecision(2) << t->jumlah << endl;
+        string id = to_string(t->id);
+        string jumlahStr = to_string(t->jumlah).substr(0, to_string(t->jumlah).find('.') + 3);
+        cout << id;
+        for (int j = 0; j < 6 - id.length(); j++) cout << " ";
+        cout << t->tanggal;
+        for (int j = 0; j < 14 - t->tanggal.length(); j++) cout << " ";
+        cout << t->kategori;
+        for (int j = 0; j < 16 - t->kategori.length(); j++) cout << " ";
+        cout << t->deskripsi;
+        for (int j = 0; j < 25 - t->deskripsi.length(); j++) cout << " ";
+        cout << "Rp " << jumlahStr << endl;
     }
 }
 
-// Urutkan Data Transaksi (Bubble Sort berkas pointer)
 void urutkanData() {
     if (daftarTransaksi == nullptr) return;
     if (jumlahData < 2) {
@@ -218,15 +202,13 @@ void urutkanData() {
         return;
     }
     
-    // Bubble Sort dengan pertukaran swap pointer objek
     for (int i = 0; i < jumlahData - 1; i++) {
         for (int j = 0; j < jumlahData - i - 1; j++) {
             if (daftarTransaksi[j].jumlah < daftarTransaksi[j+1].jumlah) {
-                // Point ke record yang akan ditukar
+
                 Transaksi* t1 = &daftarTransaksi[j];
                 Transaksi* t2 = &daftarTransaksi[j+1];
                 
-                // Swap struct data secara pointer-to-object dereference
                 Transaksi temp = *t1;
                 *t1 = *t2;
                 *t2 = temp;
@@ -237,7 +219,6 @@ void urutkanData() {
     lihatRiwayat();
 }
 
-// Linear Search dengan pointer
 void cariTransaksi() {
     if (daftarTransaksi == nullptr) return;
     string keyword;
@@ -250,18 +231,23 @@ void cariTransaksi() {
     for (int i = 0; i < jumlahData; i++) {
         Transaksi* t = &daftarTransaksi[i];
         if (t->deskripsi.find(keyword) != string::npos) {
-            cout << left << setw(6) << t->id
-                 << setw(14) << t->tanggal
-                 << setw(16) << t->kategori
-                 << setw(25) << t->deskripsi
-                 << "Rp " << fixed << setprecision(2) << t->jumlah << endl;
+            string id = to_string(t->id);
+            string jumlahStr = to_string(t->jumlah).substr(0, to_string(t->jumlah).find('.') + 3);
+            cout << id;
+            for (int j = 0; j < 6 - id.length(); j++) cout << " ";
+            cout << t->tanggal;
+            for (int j = 0; j < 14 - t->tanggal.length(); j++) cout << " ";
+            cout << t->kategori;
+            for (int j = 0; j < 16 - t->kategori.length(); j++) cout << " ";
+            cout << t->deskripsi;
+            for (int j = 0; j < 25 - t->deskripsi.length(); j++) cout << " ";
+            cout << "Rp " << jumlahStr << endl;
             ketemu = true;
         }
     }
     if (!ketemu) cout << "Pencarian nihil! Tidak ada transaksi dengan kata kunci: " << keyword << endl;
 }
 
-// Fungsi Rekursif Pointer-based untuk hitung saldo akhir
 double hitungTotalRekursif(int n) {
     if (n < 0 || daftarTransaksi == nullptr) return 0;
     
@@ -271,7 +257,6 @@ double hitungTotalRekursif(int n) {
     return nilaiVal + hitungTotalRekursif(n - 1);
 }
 
-// Tampilkan Laporan Keuangan
 void laporanKeuangan() {
     cout << "\n--- LAPORAN KEUANGAN ---" << endl;
     if (jumlahData == 0) {
@@ -280,7 +265,9 @@ void laporanKeuangan() {
     }
     double totalSaldo = hitungTotalRekursif(jumlahData - 1);
     cout << "Total Item Transaksi: " << jumlahData << endl;
-    cout << "Estimasi Saldo Akhir: Rp " << fixed << setprecision(2) << totalSaldo << endl;
+    string totalStr = to_string(totalSaldo);
+    string totalFormatted = totalStr.substr(0, totalStr.find('.') + 3);
+    cout << "Estimasi Saldo Akhir: Rp " << totalFormatted << endl;
     if (totalSaldo < 0) {
         cout << "Catatan: Pengeluaran melebihi pemasukan (Defisit keuangan)!" << endl;
     } else {
@@ -288,7 +275,120 @@ void laporanKeuangan() {
     }
 }
 
-// Simpan data dari dynamic array ke file
+void editTransaksi() {
+    if (daftarTransaksi == nullptr) return;
+    if (jumlahData == 0) {
+        cout << "Belum ada transaksi untuk diedit." << endl;
+        return;
+    }
+    
+    lihatRiwayat();
+    
+    int idEdit;
+    cout << "\n--- EDIT TRANSAKSI ---" << endl;
+    cout << "Masukkan ID transaksi yang ingin diedit: ";
+    cin >> idEdit;
+    cin.ignore(10000, '\n');
+    
+    int indexEdit = -1;
+    for (int i = 0; i < jumlahData; i++) {
+        if (daftarTransaksi[i].id == idEdit) {
+            indexEdit = i;
+            break;
+        }
+    }
+    
+    if (indexEdit == -1) {
+        cout << "Error: ID transaksi tidak ditemukan!" << endl;
+        return;
+    }
+    
+    Transaksi* t = &daftarTransaksi[indexEdit];
+    
+    cout << "\n--- EDIT DATA TRANSAKSI ID " << t->id << " ---" << endl;
+    cout << "Tanggal saat ini: " << t->tanggal << endl;
+    cout << "Tanggal baru (DD/MM/YYYY) [Enter jika tidak diubah]: ";
+    string tanggalBaru;
+    getline(cin, tanggalBaru);
+    if (!tanggalBaru.empty()) {
+        t->tanggal = tanggalBaru;
+    }
+    
+    cout << "Kategori saat ini: " << t->kategori << endl;
+    int katBaru = 0;
+    cout << "Kategori baru (1. Pemasukan, 2. Pengeluaran) [0 jika tidak diubah]: ";
+    cin >> katBaru;
+    cin.ignore(10000, '\n');
+    if (katBaru == 1 || katBaru == 2) {
+        t->kategori = (katBaru == 1) ? "Pemasukan" : "Pengeluaran";
+    }
+    
+    cout << "Deskripsi saat ini: " << t->deskripsi << endl;
+    cout << "Deskripsi baru [Enter jika tidak diubah]: ";
+    string deskripsiBaru;
+    getline(cin, deskripsiBaru);
+    if (!deskripsiBaru.empty()) {
+        t->deskripsi = deskripsiBaru;
+    }
+    
+    cout << "Nominal saat ini: " << t->jumlah << endl;
+    cout << "Nominal baru [0 atau negatif jika tidak diubah]: ";
+    double jumlahBaru;
+    cin >> jumlahBaru;
+    cin.ignore(10000, '\n');
+    if (jumlahBaru > 0) {
+        t->jumlah = jumlahBaru;
+    }
+    
+    cout << "Data transaksi berhasil diperbarui!" << endl;
+}
+
+void hapusTransaksi() {
+    if (daftarTransaksi == nullptr) return;
+    if (jumlahData == 0) {
+        cout << "Belum ada transaksi untuk dihapus." << endl;
+        return;
+    }
+    
+    lihatRiwayat();
+    
+    int idHapus;
+    cout << "\n--- HAPUS TRANSAKSI ---" << endl;
+    cout << "Masukkan ID transaksi yang ingin dihapus: ";
+    cin >> idHapus;
+    cin.ignore(10000, '\n');
+    
+    int indexHapus = -1;
+    for (int i = 0; i < jumlahData; i++) {
+        if (daftarTransaksi[i].id == idHapus) {
+            indexHapus = i;
+            break;
+        }
+    }
+    
+    if (indexHapus == -1) {
+        cout << "Error: ID transaksi tidak ditemukan!" << endl;
+        return;
+    }
+    
+    char konfirmasi;
+    cout << "Yakin ingin menghapus transaksi ID " << idHapus << "? (y/n): ";
+    cin >> konfirmasi;
+    cin.ignore(10000, '\n');
+    
+    if (konfirmasi != 'y' && konfirmasi != 'Y') {
+        cout << "Penghapusan dibatalkan." << endl;
+        return;
+    }
+    
+    for (int i = indexHapus; i < jumlahData - 1; i++) {
+        daftarTransaksi[i] = daftarTransaksi[i + 1];
+    }
+    jumlahData--;
+    
+    cout << "Transaksi ID " << idHapus << " berhasil dihapus!" << endl;
+}
+
 void simpanKeFile() {
     if (daftarTransaksi == nullptr) return;
     ofstream file(FILENAME);
@@ -309,7 +409,6 @@ void simpanKeFile() {
     cout << "Data tersimpan permanen ke file: " << FILENAME << endl;
 }
 
-// Baca data dari file dengan array standar parsing (atoi, atof) tanpa exception
 void bacaDariFile() {
     ifstream file(FILENAME);
     if (!file) {
@@ -321,7 +420,6 @@ void bacaDariFile() {
     jumlahData = 0;
     
     while (getline(file, line) && jumlahData < MAX_TRANSAKSI) {
-        // Menggunakan array string biasa berukuran konstan, bukan vector
         string data[5];
         int tokenCount = 0;
         size_t pos = 0;
@@ -338,12 +436,11 @@ void bacaDariFile() {
         if (tokenCount == 5) {
             Transaksi* t = &daftarTransaksi[jumlahData];
             
-            // Konversi string ke angka menggunakan fungsi pustaka standar cstdlib (atoi, atof)
-            t->id = atoi(data[0].c_str());
+            t->id = stoi(data[0]);
             t->tanggal = data[1];
             t->kategori = data[2];
             t->deskripsi = data[3];
-            t->jumlah = atof(data[4].c_str());
+            t->jumlah = stod(data[4]);
             
             // Validasi data untuk membuang entri rusak di luar try-catch
             if (t->jumlah >= 0 && (t->kategori == "Pemasukan" || t->kategori == "Pengeluaran")) {

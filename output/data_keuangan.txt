@@ -1,0 +1,4 @@
+2|null|Pengeluaran|null|20000
+1|null|Pemasukan|null|10000
+3|null|Pemasukan|null|10000
+4|2/06/2027|Pengeluaran|10000|10000
