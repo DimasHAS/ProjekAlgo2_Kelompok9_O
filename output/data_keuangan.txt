@@ -1,2 +1,2 @@
-2|null|Pemasukan|null|1
-3|null|Pengeluaran|wooooo|2000
+1|02/06/2026|Pemasukan|bulanan|5e+06
+2|02/06/2026|Pengeluaran|bayar kos|550000
