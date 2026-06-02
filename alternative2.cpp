@@ -40,7 +40,7 @@ int main() {
         system("cls");
 
         cout << "======================================================" << endl;
-        cout << "   PERSONAL FINANCE MANAGER (C++ Pointer & Array) " << endl;
+        cout << "              PERSONAL FINANCE MANAGER " << endl;
         cout << "======================================================" << endl;
         cout << "1. Tambah Transaksi" << endl;
         cout << "2. Lihat Riwayat (Tabel)" << endl;
