@@ -43,10 +43,10 @@ int main() {
         cout << "              PERSONAL FINANCE MANAGER " << endl;
         cout << "======================================================" << endl;
         cout << "1. Tambah Transaksi" << endl;
-        cout << "2. Lihat Riwayat (Tabel)" << endl;
-        cout << "3. Urutkan Data (Nominal Terbesar)" << endl;
-        cout << "4. Cari Transaksi (Deskripsi)" << endl;
-        cout << "5. Laporan Keuangan (Rekursif)" << endl;
+        cout << "2. Lihat Riwayat" << endl;
+        cout << "3. Urutkan Data" << endl;
+        cout << "4. Cari Transaksi" << endl;
+        cout << "5. Laporan Keuangan" << endl;
         cout << "6. Edit Transaksi" << endl;
         cout << "7. Hapus Transaksi" << endl;
         cout << "8. Simpan & Keluar" << endl;
